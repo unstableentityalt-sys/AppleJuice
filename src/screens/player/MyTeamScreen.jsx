@@ -4,6 +4,7 @@ import { useData } from "../../context/DataContext";
 import TopBar from "../../components/TopBar";
 import AccountButton from "../../components/AccountButton";
 import EmptyState from "../../components/EmptyState";
+import SeriesBanner from "../../components/SeriesBanner";
 import { initials, TEAM_COLORS } from "../../lib/helpers";
 
 export default function MyTeamScreen() {
@@ -17,6 +18,7 @@ export default function MyTeamScreen() {
     <>
       <TopBar title="My Team" right={<AccountButton />} />
       <div className="app-main">
+        <SeriesBanner />
         <div className="section-title">
           <h2>My Teams</h2>
         </div>

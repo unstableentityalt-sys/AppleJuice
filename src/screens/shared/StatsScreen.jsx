@@ -5,6 +5,7 @@ import TopBar from "../../components/TopBar";
 import AccountButton from "../../components/AccountButton";
 import EmptyState from "../../components/EmptyState";
 import StatsTable from "../../components/StatsTable";
+import SeriesBanner from "../../components/SeriesBanner";
 import { computeSeasonStats, computeStandings } from "../../lib/stats";
 
 export default function StatsScreen() {
@@ -38,6 +39,7 @@ export default function StatsScreen() {
     <>
       <TopBar title="Stats & Standings" right={<AccountButton />} />
       <div className="app-main">
+        <SeriesBanner />
         <div className="card">
           <div className="field">
             <label htmlFor="stats-team">Team</label>

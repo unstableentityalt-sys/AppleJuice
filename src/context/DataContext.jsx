@@ -9,6 +9,18 @@ export function DataProvider({ children }) {
   const [teams, setTeams] = useStorage("teams", [], { shared: true });
   const [games, setGames] = useStorage("games", [], { shared: true });
   const [news, setNews] = useStorage("news", [], { shared: true });
+  const [series, setSeriesState] = useStorage("series", null, { shared: true });
+
+  const setSeries = useCallback(
+    (teamAId, teamBId, winsNeeded) => {
+      setSeriesState({ teamAId, teamBId, winsNeeded });
+    },
+    [setSeriesState],
+  );
+
+  const clearSeries = useCallback(() => {
+    setSeriesState(null);
+  }, [setSeriesState]);
 
   // --- Teams & rosters ---
 
@@ -274,6 +286,9 @@ export function DataProvider({ children }) {
       teams,
       games,
       news,
+      series,
+      setSeries,
+      clearSeries,
       createTeam,
       updateTeam,
       deleteTeam,
@@ -294,7 +309,7 @@ export function DataProvider({ children }) {
       postNews,
       deleteNews,
     }),
-    [teams, games, news, createTeam, updateTeam, deleteTeam, addRosterEntry, updateRosterEntry, removeRosterEntry, joinTeam, leaveTeam, createGame, appendPlay, addGhostRunner, undoLastPlay, updateLogEntry, deleteLogEntry, finalizeGame, reopenGame, deleteGame, postNews, deleteNews],
+    [teams, games, news, series, setSeries, clearSeries, createTeam, updateTeam, deleteTeam, addRosterEntry, updateRosterEntry, removeRosterEntry, joinTeam, leaveTeam, createGame, appendPlay, addGhostRunner, undoLastPlay, updateLogEntry, deleteLogEntry, finalizeGame, reopenGame, deleteGame, postNews, deleteNews],
   );
 
   return <DataContext.Provider value={value}>{children}</DataContext.Provider>;

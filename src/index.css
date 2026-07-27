@@ -654,6 +654,95 @@ hr.dashed {
   flex: 1;
 }
 
+.series-card {
+  border: 2px solid var(--sun);
+  background: linear-gradient(180deg, rgba(244, 197, 66, 0.12), var(--card-bg) 40%);
+}
+
+.series-score {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  margin: 12px 0 6px;
+}
+
+.series-team {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  min-width: 84px;
+}
+
+.series-team-name {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--ink-soft);
+  text-align: center;
+}
+
+.series-team-wins {
+  font-size: 32px;
+  font-weight: 900;
+  color: var(--ink);
+  line-height: 1;
+}
+
+.series-dash {
+  font-size: 24px;
+  font-weight: 900;
+  color: var(--ink-soft);
+}
+
+.series-status {
+  text-align: center;
+  font-weight: 700;
+  font-size: 13px;
+  color: var(--ink-soft);
+}
+
+.series-status.clinched {
+  color: var(--dirt-dark);
+  font-size: 15px;
+}
+
+.series-games-row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 10px;
+}
+
+.series-game-pill {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 2px solid var(--line);
+  background: var(--card-bg);
+  font-size: 11px;
+  font-weight: 800;
+  color: var(--ink-soft);
+  cursor: pointer;
+}
+
+.series-game-pill.a {
+  background: var(--grass);
+  color: var(--chalk);
+  border-color: var(--grass-dark);
+}
+
+.series-game-pill.b {
+  background: var(--sky);
+  color: var(--ink);
+  border-color: #3a7fa6;
+}
+
+.series-game-pill.tie {
+  background: var(--line);
+}
+
 .outcome-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);

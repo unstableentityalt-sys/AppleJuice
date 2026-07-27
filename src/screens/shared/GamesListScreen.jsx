@@ -5,6 +5,7 @@ import TopBar from "../../components/TopBar";
 import AccountButton from "../../components/AccountButton";
 import EmptyState from "../../components/EmptyState";
 import GameCard from "../../components/GameCard";
+import SeriesBanner from "../../components/SeriesBanner";
 
 export default function GamesListScreen() {
   const { role } = useAuth();
@@ -33,6 +34,7 @@ export default function GamesListScreen() {
         }
       />
       <div className="app-main">
+        <SeriesBanner />
         {sorted.length === 0 ? (
           <EmptyState
             emoji="⚾"
