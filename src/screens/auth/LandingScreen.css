@@ -1,0 +1,118 @@
+.landing {
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  background:
+    radial-gradient(circle at 50% 0%, var(--sun) 0%, transparent 45%),
+    linear-gradient(to bottom, var(--sky) 0%, var(--sky) 38%, var(--grass) 38%, var(--grass-dark) 100%);
+}
+
+.landing-hero {
+  flex: 0 0 auto;
+  padding: 56px 24px 24px;
+  text-align: center;
+  color: var(--ink);
+}
+
+.landing-ball {
+  width: 64px;
+  height: 64px;
+  filter: drop-shadow(0 6px 10px rgba(0, 0, 0, 0.25));
+  margin-bottom: 10px;
+}
+
+.landing-hero h1 {
+  font-size: 30px;
+  color: var(--ink);
+}
+
+.tagline {
+  font-weight: 600;
+  color: var(--ink-soft);
+  margin-top: 4px;
+}
+
+.landing-card {
+  margin: 8px 20px 40px;
+  padding: 22px;
+  background: var(--card-bg);
+  border-radius: 22px;
+  box-shadow: var(--shadow-pop);
+}
+
+.mode-toggle {
+  display: flex;
+  background: var(--line);
+  border-radius: 999px;
+  padding: 4px;
+  margin-bottom: 18px;
+}
+
+.mode-toggle button {
+  flex: 1;
+  border: none;
+  background: transparent;
+  padding: 10px;
+  border-radius: 999px;
+  font-weight: 800;
+  color: var(--ink-soft);
+  cursor: pointer;
+}
+
+.mode-toggle button.active {
+  background: var(--grass);
+  color: var(--chalk);
+}
+
+.role-pick {
+  display: flex;
+  gap: 8px;
+}
+
+.role-pick button {
+  flex: 1;
+  padding: 12px;
+  border-radius: 12px;
+  border: 2px solid var(--line);
+  background: var(--card-bg);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.role-pick button.active {
+  border-color: var(--grass);
+  background: rgba(63, 125, 58, 0.1);
+  color: var(--grass-dark);
+}
+
+.or-divider {
+  text-align: center;
+  color: var(--ink-soft);
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  margin: 18px 0 12px;
+  position: relative;
+}
+
+.or-divider::before,
+.or-divider::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  width: 40%;
+  border-top: 1px solid var(--line);
+}
+.or-divider::before {
+  left: 0;
+}
+.or-divider::after {
+  right: 0;
+}
+
+.fan-hint {
+  margin-top: 10px;
+  font-size: 12px;
+  color: var(--ink-soft);
+  text-align: center;
+}
