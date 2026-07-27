@@ -37,6 +37,25 @@ export default function CorrectionsPanel({ game, teams }) {
               <p style={{ color: "var(--ink-soft)" }}>No plays logged.</p>
             )}
             {state.entries.map((e) => {
+              if (e.type === "ghost") {
+                return (
+                  <div key={e.id} className="row between" style={{ padding: "6px 0", borderBottom: "1px solid var(--line)" }}>
+                    <span style={{ fontSize: 13 }}>
+                      {e.half === "top" ? "T" : "B"}
+                      {e.inning} — 👻 Ghost added to {e.base}
+                    </span>
+                    <button
+                      className="btn ghost small"
+                      style={{ color: "var(--danger)" }}
+                      onClick={() => {
+                        if (window.confirm("Remove this ghost runner?")) deleteLogEntry(game.id, e.id);
+                      }}
+                    >
+                      ✕
+                    </button>
+                  </div>
+                );
+              }
               const { entry } = findRosterEntry(teams, e.batterId);
               return (
                 <div key={e.id} className="row between" style={{ padding: "6px 0", borderBottom: "1px solid var(--line)" }}>

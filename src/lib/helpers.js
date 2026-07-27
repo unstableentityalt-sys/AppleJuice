@@ -15,6 +15,13 @@ export function playerName(teams, rosterId) {
   return entry ? entry.name : "Unknown";
 }
 
+export function shortName(name) {
+  if (!name) return "";
+  const parts = name.trim().split(/\s+/);
+  if (parts.length === 1) return parts[0];
+  return `${parts[0]} ${parts[parts.length - 1][0]}.`;
+}
+
 export function initials(name) {
   if (!name) return "?";
   const parts = name.trim().split(/\s+/);

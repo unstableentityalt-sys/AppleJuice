@@ -3,7 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { useData } from "../../context/DataContext";
 import TopBar from "../../components/TopBar";
 import EmptyState from "../../components/EmptyState";
-import { INNINGS_OPTIONS, OUTS_OPTIONS, DEFAULT_RULES } from "../../lib/rules";
+import { INNINGS_OPTIONS, OUTS_OPTIONS, PITCHES_OPTIONS, DEFAULT_RULES } from "../../lib/rules";
+import { computeSeriesRecord } from "../../lib/series";
 
 function LineupPicker({ team, selected, onToggle, onMove }) {
   if (!team) return null;
@@ -46,7 +47,7 @@ function LineupPicker({ team, selected, onToggle, onMove }) {
 }
 
 export default function GameSetupScreen() {
-  const { teams, createGame } = useData();
+  const { teams, games, series, createGame } = useData();
   const navigate = useNavigate();
 
   const [homeTeamId, setHomeTeamId] = useState(teams[0]?.id || "");
@@ -159,6 +160,25 @@ export default function GameSetupScreen() {
               </div>
             </div>
             {sameTeam && <p className="error-text">Pick two different teams.</p>}
+            {!sameTeam && series && (() => {
+              const pair = [homeTeamId, awayTeamId].sort();
+              const seriesPair = [series.teamAId, series.teamBId].sort();
+              if (pair[0] !== seriesPair[0] || pair[1] !== seriesPair[1]) return null;
+              const record = computeSeriesRecord(games, series);
+              if (record.clinchedTeamId) {
+                const winner = teams.find((t) => t.id === record.clinchedTeamId);
+                return (
+                  <p className="pill sun">
+                    🏆 Series already won by {winner?.name} — this would be an extra game.
+                  </p>
+                );
+              }
+              return (
+                <p className="pill sun">
+                  This will be Game {record.games.length + 1} of the Finals series.
+                </p>
+              );
+            })()}
           </div>
 
           <div className="card">
@@ -220,6 +240,33 @@ export default function GameSetupScreen() {
                 onChange={(e) => setRules((r) => ({ ...r, walksEnabled: e.target.checked }))}
               />
             </div>
+            {!rules.walksEnabled && (
+              <div className="field">
+                <label>Batter is out after this many pitches</label>
+                <div className="row" style={{ flexWrap: "wrap" }}>
+                  {PITCHES_OPTIONS.map((n) => (
+                    <button
+                      key={n}
+                      type="button"
+                      className={`btn small ${rules.pitchesUntilOut === n ? "" : "secondary"}`}
+                      onClick={() => setRules((r) => ({ ...r, pitchesUntilOut: n }))}
+                    >
+                      {n}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+            {rules.baseRunning === "traditional" && (
+              <div className="field row between">
+                <label style={{ margin: 0 }}>Ghost runners allowed</label>
+                <input
+                  type="checkbox"
+                  checked={rules.ghostRunners}
+                  onChange={(e) => setRules((r) => ({ ...r, ghostRunners: e.target.checked }))}
+                />
+              </div>
+            )}
           </div>
 
           <LineupPicker

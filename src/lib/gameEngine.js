@@ -1,4 +1,4 @@
-import { OUT_OUTCOMES, HIT_OUTCOMES } from "./rules";
+import { OUT_OUTCOMES, HIT_OUTCOMES, GHOST_RUNNER } from "./rules";
 
 const EMPTY_BASES = { first: null, second: null, third: null };
 
@@ -115,10 +115,27 @@ export function replayGame(game) {
     if (gameOver) break;
 
     const teamKey = half === "top" ? "away" : "home";
+
+    // Ghost-runner placement: a direct base edit, not a plate appearance.
+    if (logEntry.type === "ghost") {
+      bases = { ...bases, [logEntry.base]: GHOST_RUNNER };
+      entries.push({ ...logEntry, inning, half, teamKey, batterId: null });
+      continue;
+    }
+
     const lineup = lineups[teamKey] || [];
     const idx = lineup.length ? battingCount[teamKey] % lineup.length : 0;
     const batterId = lineup[idx] || null;
     battingCount[teamKey] += 1;
+
+    // A batter can't simultaneously be on base and at the plate - this only
+    // comes up with very short lineups where the order wraps quickly.
+    // Auto-promote them to a ghost runner so the at-bat can proceed.
+    if (batterId) {
+      for (const base of ["first", "second", "third"]) {
+        if (bases[base] === batterId) bases = { ...bases, [base]: GHOST_RUNNER };
+      }
+    }
 
     const result = resolvePlay(logEntry.outcome, bases, rules, outs, batterId);
     outs += result.outsRecorded;

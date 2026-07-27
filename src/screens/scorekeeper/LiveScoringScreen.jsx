@@ -1,13 +1,14 @@
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useData } from "../../context/DataContext";
 import { replayGame } from "../../lib/gameEngine";
 import { OUTCOMES, OUTCOME_LABELS } from "../../lib/rules";
-import { findTeam, findRosterEntry } from "../../lib/helpers";
+import { findTeam, findRosterEntry, shortName } from "../../lib/helpers";
 import BaseDiamond from "../../components/BaseDiamond";
 
 export default function LiveScoringScreen({ game, teams }) {
-  const { appendPlay, undoLastPlay, finalizeGame } = useData();
+  const { appendPlay, addGhostRunner, undoLastPlay, finalizeGame } = useData();
   const state = useMemo(() => replayGame(game), [game]);
+  const rules = game.rules;
 
   const home = findTeam(teams, game.homeTeamId);
   const away = findTeam(teams, game.awayTeamId);
@@ -16,6 +17,16 @@ export default function LiveScoringScreen({ game, teams }) {
   const batterId = state.nextBatter[battingTeamKey];
   const { entry: batter } = findRosterEntry(teams, batterId);
 
+  const [balls, setBalls] = useState(0);
+  const [strikes, setStrikes] = useState(0);
+
+  // A new batter (or an undo that reverts to a previous one) starts fresh -
+  // we only track the pitch count for display, not as part of the log.
+  useEffect(() => {
+    setBalls(0);
+    setStrikes(0);
+  }, [batterId, state.half, state.inning]);
+
   const maxInnings = Math.max(
     game.rules.innings,
     state.lineScore.home.length,
@@ -23,7 +34,7 @@ export default function LiveScoringScreen({ game, teams }) {
   );
 
   const outcomesToShow = OUTCOMES.filter(
-    (o) => o !== "Walk" || game.rules.walksEnabled,
+    (o) => o !== "Walk" || rules.walksEnabled,
   );
 
   function classFor(outcome) {
@@ -32,7 +43,51 @@ export default function LiveScoringScreen({ game, teams }) {
     return "";
   }
 
+  function logOutcome(outcome) {
+    setBalls(0);
+    setStrikes(0);
+    appendPlay(game.id, outcome);
+  }
+
+  function handleBall() {
+    const nextBalls = balls + 1;
+    if (rules.walksEnabled) {
+      if (nextBalls >= 4) return logOutcome("Walk");
+      setBalls(nextBalls);
+      return;
+    }
+    if (nextBalls + strikes >= rules.pitchesUntilOut) return logOutcome("Strikeout");
+    setBalls(nextBalls);
+  }
+
+  function handleStrike() {
+    const nextStrikes = strikes + 1;
+    if (nextStrikes >= 3) return logOutcome("Strikeout");
+    if (!rules.walksEnabled && balls + nextStrikes >= rules.pitchesUntilOut) {
+      return logOutcome("Strikeout");
+    }
+    setStrikes(nextStrikes);
+  }
+
+  function handleFoul() {
+    if (strikes >= 2) return; // foul with 2 strikes is a no-op, same as real baseball
+    const nextStrikes = strikes + 1;
+    if (!rules.walksEnabled && balls + nextStrikes >= rules.pitchesUntilOut) {
+      return logOutcome("Strikeout");
+    }
+    setStrikes(nextStrikes);
+  }
+
   const canPlay = !state.gameOver;
+  const isTraditional = rules.baseRunning === "traditional";
+
+  const baseLabels = isTraditional
+    ? {
+        first: shortName(findRosterEntry(teams, state.bases.first).entry?.name),
+        second: shortName(findRosterEntry(teams, state.bases.second).entry?.name),
+        third: shortName(findRosterEntry(teams, state.bases.third).entry?.name),
+      }
+    : {};
 
   return (
     <div className="app-main">
@@ -90,7 +145,21 @@ export default function LiveScoringScreen({ game, teams }) {
             {state.half === "top" ? "Top" : "Bottom"} {state.inning} · {battingTeam?.name} batting
           </p>
           <div className="row" style={{ justifyContent: "center", margin: "12px 0" }}>
-            <BaseDiamond bases={game.rules.baseRunning === "traditional" ? state.bases : {}} />
+            {isTraditional ? (
+              <BaseDiamond
+                bases={state.bases}
+                labels={baseLabels}
+                onAddGhost={
+                  canPlay && rules.ghostRunners
+                    ? (base) => addGhostRunner(game.id, base)
+                    : undefined
+                }
+              />
+            ) : (
+              <p style={{ color: "var(--ink-soft)", fontSize: 12 }}>
+                Zone play — no baserunners tracked.
+              </p>
+            )}
           </div>
           <div className="outs-dots" style={{ justifyContent: "center", marginBottom: 10 }}>
             {Array.from({ length: game.rules.outsPerInning }, (_, i) => (
@@ -101,6 +170,41 @@ export default function LiveScoringScreen({ game, teams }) {
             At bat: {batter ? batter.name : "—"}
             {batter?.jerseyNumber ? ` #${batter.jerseyNumber}` : ""}
           </h3>
+
+          {canPlay && batter && (
+            <div className="count-row">
+              <div className="count-group">
+                <span className="count-label">Balls</span>
+                <div className="outs-dots">
+                  {Array.from({ length: 4 }, (_, i) => (
+                    <span key={i} className={`dot ball ${i < balls ? "filled" : ""}`} />
+                  ))}
+                </div>
+              </div>
+              <div className="count-group">
+                <span className="count-label">Strikes</span>
+                <div className="outs-dots">
+                  {Array.from({ length: 3 }, (_, i) => (
+                    <span key={i} className={`dot strike ${i < strikes ? "filled" : ""}`} />
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {canPlay && batter && (
+        <div className="pitch-buttons">
+          <button type="button" className="btn secondary small" onClick={handleBall}>
+            Ball
+          </button>
+          <button type="button" className="btn secondary small" onClick={handleStrike}>
+            Strike
+          </button>
+          <button type="button" className="btn secondary small" onClick={handleFoul}>
+            Foul Ball
+          </button>
         </div>
       )}
 
@@ -115,7 +219,7 @@ export default function LiveScoringScreen({ game, teams }) {
                 key={o}
                 type="button"
                 className={classFor(o)}
-                onClick={() => appendPlay(game.id, o)}
+                onClick={() => logOutcome(o)}
                 disabled={!batter}
               >
                 {OUTCOME_LABELS[o]}
@@ -155,6 +259,17 @@ export default function LiveScoringScreen({ game, teams }) {
           <p style={{ color: "var(--ink-soft)" }}>No plays logged yet.</p>
         ) : (
           [...state.entries].reverse().map((e) => {
+            if (e.type === "ghost") {
+              return (
+                <div className="play-log-item" key={e.id}>
+                  <span>
+                    {e.half === "top" ? "T" : "B"}
+                    {e.inning} — 👻 Ghost runner
+                  </span>
+                  <span>added to {e.base} base</span>
+                </div>
+              );
+            }
             const { entry } = findRosterEntry(teams, e.batterId);
             return (
               <div className="play-log-item" key={e.id}>
