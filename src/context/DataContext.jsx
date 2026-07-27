@@ -166,6 +166,19 @@ export function DataProvider({ children }) {
     [setGames],
   );
 
+  const addGhostRunner = useCallback(
+    (gameId, base) => {
+      setGames((prev) =>
+        prev.map((g) =>
+          g.id === gameId
+            ? { ...g, log: [...g.log, { id: makeId("ghost"), type: "ghost", base }] }
+            : g,
+        ),
+      );
+    },
+    [setGames],
+  );
+
   const undoLastPlay = useCallback(
     (gameId) => {
       setGames((prev) =>
@@ -271,6 +284,7 @@ export function DataProvider({ children }) {
       leaveTeam,
       createGame,
       appendPlay,
+      addGhostRunner,
       undoLastPlay,
       updateLogEntry,
       deleteLogEntry,
@@ -280,7 +294,7 @@ export function DataProvider({ children }) {
       postNews,
       deleteNews,
     }),
-    [teams, games, news, createTeam, updateTeam, deleteTeam, addRosterEntry, updateRosterEntry, removeRosterEntry, joinTeam, leaveTeam, createGame, appendPlay, undoLastPlay, updateLogEntry, deleteLogEntry, finalizeGame, reopenGame, deleteGame, postNews, deleteNews],
+    [teams, games, news, createTeam, updateTeam, deleteTeam, addRosterEntry, updateRosterEntry, removeRosterEntry, joinTeam, leaveTeam, createGame, appendPlay, addGhostRunner, undoLastPlay, updateLogEntry, deleteLogEntry, finalizeGame, reopenGame, deleteGame, postNews, deleteNews],
   );
 
   return <DataContext.Provider value={value}>{children}</DataContext.Provider>;

@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useData } from "../../context/DataContext";
 import TopBar from "../../components/TopBar";
 import EmptyState from "../../components/EmptyState";
-import { INNINGS_OPTIONS, OUTS_OPTIONS, DEFAULT_RULES } from "../../lib/rules";
+import { INNINGS_OPTIONS, OUTS_OPTIONS, PITCHES_OPTIONS, DEFAULT_RULES } from "../../lib/rules";
 
 function LineupPicker({ team, selected, onToggle, onMove }) {
   if (!team) return null;
@@ -220,6 +220,33 @@ export default function GameSetupScreen() {
                 onChange={(e) => setRules((r) => ({ ...r, walksEnabled: e.target.checked }))}
               />
             </div>
+            {!rules.walksEnabled && (
+              <div className="field">
+                <label>Batter is out after this many pitches</label>
+                <div className="row" style={{ flexWrap: "wrap" }}>
+                  {PITCHES_OPTIONS.map((n) => (
+                    <button
+                      key={n}
+                      type="button"
+                      className={`btn small ${rules.pitchesUntilOut === n ? "" : "secondary"}`}
+                      onClick={() => setRules((r) => ({ ...r, pitchesUntilOut: n }))}
+                    >
+                      {n}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+            {rules.baseRunning === "traditional" && (
+              <div className="field row between">
+                <label style={{ margin: 0 }}>Ghost runners allowed</label>
+                <input
+                  type="checkbox"
+                  checked={rules.ghostRunners}
+                  onChange={(e) => setRules((r) => ({ ...r, ghostRunners: e.target.checked }))}
+                />
+              </div>
+            )}
           </div>
 
           <LineupPicker

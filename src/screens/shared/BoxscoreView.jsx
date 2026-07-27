@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import { replayGame, computeGameBoxscore } from "../../lib/gameEngine";
-import { findTeam } from "../../lib/helpers";
+import { findTeam, findRosterEntry, shortName } from "../../lib/helpers";
 import { average, formatAvg } from "../../lib/stats";
 import BaseDiamond from "../../components/BaseDiamond";
 
@@ -103,7 +103,14 @@ export default function BoxscoreView({ game, teams }) {
         </table>
         {game.status === "in_progress" && !state.gameOver && game.rules.baseRunning === "traditional" && (
           <div className="row" style={{ justifyContent: "center", marginTop: 10 }}>
-            <BaseDiamond bases={state.bases} />
+            <BaseDiamond
+              bases={state.bases}
+              labels={{
+                first: shortName(findRosterEntry(teams, state.bases.first).entry?.name),
+                second: shortName(findRosterEntry(teams, state.bases.second).entry?.name),
+                third: shortName(findRosterEntry(teams, state.bases.third).entry?.name),
+              }}
+            />
           </div>
         )}
       </div>

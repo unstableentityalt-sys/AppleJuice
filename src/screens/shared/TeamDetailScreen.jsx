@@ -5,7 +5,7 @@ import { useData } from "../../context/DataContext";
 import TopBar from "../../components/TopBar";
 import EmptyState from "../../components/EmptyState";
 import { initials, TEAM_COLORS } from "../../lib/helpers";
-import { INNINGS_OPTIONS, OUTS_OPTIONS } from "../../lib/rules";
+import { INNINGS_OPTIONS, OUTS_OPTIONS, PITCHES_OPTIONS } from "../../lib/rules";
 
 const POSITIONS = ["Pitcher", "Catcher", "1B", "2B", "3B", "SS", "LF", "CF", "RF", "Utility"];
 
@@ -339,6 +339,33 @@ function TeamRulesForm({ team, onSave }) {
           onChange={(e) => setRules((r) => ({ ...r, walksEnabled: e.target.checked }))}
         />
       </div>
+      {!rules.walksEnabled && (
+        <div className="field">
+          <label>Batter is out after this many pitches</label>
+          <div className="row" style={{ flexWrap: "wrap" }}>
+            {PITCHES_OPTIONS.map((n) => (
+              <button
+                key={n}
+                type="button"
+                className={`btn small ${rules.pitchesUntilOut === n ? "" : "secondary"}`}
+                onClick={() => setRules((r) => ({ ...r, pitchesUntilOut: n }))}
+              >
+                {n}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+      {rules.baseRunning === "traditional" && (
+        <div className="field row between">
+          <label style={{ margin: 0 }}>Ghost runners allowed</label>
+          <input
+            type="checkbox"
+            checked={rules.ghostRunners}
+            onChange={(e) => setRules((r) => ({ ...r, ghostRunners: e.target.checked }))}
+          />
+        </div>
+      )}
       <button className="btn block" onClick={save} type="button">
         Save Rules
       </button>

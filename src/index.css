@@ -530,9 +530,17 @@ hr.dashed {
   font: inherit;
 }
 
+.base-diamond-wrap {
+  position: relative;
+  width: 220px;
+  height: 190px;
+  margin: 0 auto;
+}
+
 .base-diamond {
-  width: 110px;
-  height: 110px;
+  width: 100%;
+  height: 100%;
+  display: block;
 }
 
 .base-diamond .base {
@@ -551,6 +559,42 @@ hr.dashed {
   stroke: none;
 }
 
+.base-label-slot {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  display: flex;
+  justify-content: center;
+}
+
+.base-chip {
+  background: var(--card-bg);
+  border: 2px solid var(--dirt-dark);
+  color: var(--ink);
+  border-radius: 999px;
+  padding: 3px 9px;
+  font-size: 11px;
+  font-weight: 800;
+  white-space: nowrap;
+  box-shadow: var(--shadow-soft);
+}
+
+.base-chip.ghost {
+  border-color: var(--ink-soft);
+  color: var(--ink-soft);
+  font-style: italic;
+}
+
+.base-add-ghost {
+  background: rgba(255, 255, 255, 0.6);
+  border: 2px dashed var(--ink-soft);
+  border-radius: 999px;
+  padding: 3px 8px;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--ink-soft);
+  cursor: pointer;
+}
+
 .outs-dots {
   display: flex;
   gap: 6px;
@@ -567,6 +611,47 @@ hr.dashed {
 .outs-dots .dot.filled {
   background: var(--danger);
   border-color: var(--danger);
+}
+
+.outs-dots .dot.ball.filled {
+  background: var(--sky);
+  border-color: #3a7fa6;
+}
+
+.outs-dots .dot.strike.filled {
+  background: var(--dirt-dark);
+  border-color: var(--dirt-dark);
+}
+
+.count-row {
+  display: flex;
+  justify-content: center;
+  gap: 24px;
+  margin-top: 12px;
+}
+
+.count-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.count-label {
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+
+.pitch-buttons {
+  display: flex;
+  gap: 8px;
+  margin: 12px 0;
+}
+
+.pitch-buttons .btn {
+  flex: 1;
 }
 
 .outcome-grid {

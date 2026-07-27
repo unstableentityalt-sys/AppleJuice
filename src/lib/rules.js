@@ -36,7 +36,12 @@ export const DEFAULT_RULES = {
   outsPerInning: 3,
   baseRunning: "traditional", // 'traditional' | 'zone'
   walksEnabled: true,
+  pitchesUntilOut: 5, // used instead of a walk when walksEnabled is false
+  ghostRunners: true, // let the scorekeeper drop a placeholder runner on base
 };
 
 export const INNINGS_OPTIONS = [3, 5, 7];
 export const OUTS_OPTIONS = [1, 2, 3];
+export const PITCHES_OPTIONS = [3, 4, 5, 6, 7, 8];
+
+export const GHOST_RUNNER = "ghost";
