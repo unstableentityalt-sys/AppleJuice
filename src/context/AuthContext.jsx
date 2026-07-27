@@ -1,9 +1,13 @@
-import { createContext, useCallback, useContext, useMemo } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo } from "react";
 import { useStorage } from "../lib/useStorage";
 import { hashPassword, verifyPassword } from "../lib/hash";
 import { makeId } from "../lib/id";
 
 const AuthContext = createContext(null);
+
+// Seeded on first load so this scorekeeper login works out of the box on any
+// fresh browser, since there's no backend to provision it centrally.
+const SEED_ACCOUNTS = [{ username: "JacobCole", password: "bwcmaine", role: "scorekeeper" }];
 
 export function AuthProvider({ children }) {
   const [accounts, setAccounts] = useStorage("accounts", [], { shared: true });
@@ -12,6 +16,37 @@ export function AuthProvider({ children }) {
     { accountId: null, guest: false },
     { shared: false },
   );
+
+  useEffect(() => {
+    let cancelled = false;
+    async function seed() {
+      for (const seedAccount of SEED_ACCOUNTS) {
+        const exists = accounts.some(
+          (a) => a.username.toLowerCase() === seedAccount.username.toLowerCase(),
+        );
+        if (exists) continue;
+        const passwordHash = await hashPassword(seedAccount.password);
+        if (cancelled) return;
+        const account = {
+          id: makeId("acct"),
+          username: seedAccount.username,
+          passwordHash,
+          role: seedAccount.role,
+          createdAt: Date.now(),
+        };
+        setAccounts((prev) =>
+          prev.some((a) => a.username.toLowerCase() === seedAccount.username.toLowerCase())
+            ? prev
+            : [...prev, account],
+        );
+      }
+    }
+    seed();
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [accounts.length]);
 
   const currentAccount = useMemo(
     () => accounts.find((a) => a.id === session.accountId) || null,
